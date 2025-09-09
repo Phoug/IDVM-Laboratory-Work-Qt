@@ -1,0 +1,5 @@
+*.svg text eol=lf
+*.png binary
+*.jpg binary
+*.cpp text
+*.h text
