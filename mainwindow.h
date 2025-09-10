@@ -9,6 +9,7 @@
 #include <QPixmap>
 
 #include "define.h"
+#include "lab1window.h"
 
 class MainWindow : public QMainWindow
 {
@@ -36,6 +37,17 @@ private:
     QLabel *characterLabel;
     QTimer *animTimer;
     QMap<QString, QPixmap> sprites;
+
+    QLabel *frameLab1;
+    QLabel *frameLab2;
+    QLabel *frameLab3;
+    QLabel *frameLab4;
+    QLabel *frameLab5;
+    QLabel *frameLab6;
+    QRect frameRects[NUMBERS_OF_LAB_FRAMES];
+    QLabel *buttonELabel;
+
+    Lab1Window *lab1Window;
 };
 
 #endif // MAINWINDOW_H

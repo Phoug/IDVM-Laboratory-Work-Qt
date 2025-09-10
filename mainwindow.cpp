@@ -53,16 +53,67 @@ MainWindow::MainWindow(QWidget *parent)
     sprites["right_asleepy"] = QPixmap(":/morty/asleepy/right_аsleepy_calm.png");
 
     sprites["front_sleepy"] = QPixmap(":/morty/sleepy/front_sleepy_calm.png");
-    sprites["back_sleepy"]  = QPixmap(":/morty/sleepy/back_sleepy_calm.png");
+    sprites["back_sleepy"]  = QPixmap(":/morty/sleepy/bacl_sleepy_calm.png");
     sprites["left_sleepy"]  = QPixmap(":/morty/sleepy/left_sleepy_calm.png");
     sprites["right_sleepy"] = QPixmap(":/morty/sleepy/right_sleepy_calm.png");
 
-    characterLabel->setPixmap(sprites["front_calm"]);
+    characterLabel->setPixmap(sprites["front_sleepy"]);
 
     animTimer = new QTimer(this);
     connect(animTimer, &QTimer::timeout, this, &MainWindow::updateAnimation);
     animTimer->start(50);
 
+    // --- добавляем рамки лабораторных ---
+    frameLab1 = new QLabel(central);
+    frameLab1->setPixmap(QPixmap(":/images/other/frame_lab1.svg"));
+    frameLab1->setGeometry(5, 5, 250, 180);   // левая колонка сверху
+    frameLab1->setScaledContents(true);
+    frameLab1->setStyleSheet("background: transparent");
+
+    frameLab2 = new QLabel(central);
+    frameLab2->setPixmap(QPixmap(":/images/other/frame_lab2.svg"));
+    frameLab2->setGeometry(5, 190, 250, 180);   // левая колонка по центру
+    frameLab2->setScaledContents(true);
+    frameLab2->setStyleSheet("background: transparent");
+
+    frameLab3 = new QLabel(central);
+    frameLab3->setPixmap(QPixmap(":/images/other/frame_lab3.svg"));
+    frameLab3->setGeometry(5, 380, 250, 180);   // левая колонка снизу
+    frameLab3->setScaledContents(true);
+    frameLab3->setStyleSheet("background: transparent");
+
+    frameLab4 = new QLabel(central);
+    frameLab4->setPixmap(QPixmap(":/images/other/frame_lab4.svg"));
+    frameLab4->setGeometry(1020, 5, 250, 180); // правая колонка сверху
+    frameLab4->setScaledContents(true);
+    frameLab4->setStyleSheet("background: transparent");
+
+    frameLab5 = new QLabel(central);
+    frameLab5->setPixmap(QPixmap(":/images/other/frame_lab5.svg"));
+    frameLab5->setGeometry(1020, 190, 250, 180); // правая колонка по центру
+    frameLab5->setScaledContents(true);
+    frameLab5->setStyleSheet("background: transparent");
+
+    frameLab6 = new QLabel(central);
+    frameLab6->setPixmap(QPixmap(":/images/other/frame_lab6.svg"));
+    frameLab6->setGeometry(1020, 380, 250, 180); // правая колонка снизу
+    frameLab6->setScaledContents(true);
+    frameLab6->setStyleSheet("background: transparent");
+
+    frameRects[0] = frameLab1->geometry();
+    frameRects[1] = frameLab2->geometry();
+    frameRects[2] = frameLab3->geometry();
+    frameRects[3] = frameLab4->geometry();
+    frameRects[4] = frameLab5->geometry();
+    frameRects[5] = frameLab6->geometry();
+
+    buttonELabel = new QLabel(central);
+    buttonELabel->setPixmap(QPixmap(":/images/other/button_e.svg"));
+    buttonELabel->setScaledContents(true);
+    buttonELabel->setGeometry(590, 605, 100, 100); // правая колонка снизу
+    buttonELabel->hide();
+
+    characterLabel->raise();
     qApp->installEventFilter(this);
 }
 
@@ -134,7 +185,7 @@ void MainWindow::updateAnimation()
             default:    key = "front_calm"; break;
             }
         } else if (idleCounter < 80) {
-            // 2–4 сек → моргаем sleepy
+            // 2–4 сек → моргаем asleepy
             switch (currentDirection) {
             case Back:  key = (idleCounter % 40 < 20) ? "back_calm" : "back_asleepy"; break;
             case Front: key = (idleCounter % 40 < 20) ? "front_calm" : "front_asleepy"; break;
@@ -143,7 +194,7 @@ void MainWindow::updateAnimation()
             default:    key = "front_calm"; break;
             }
         } else {
-            // больше 4 сек → asleepy (засыпает)
+            // больше 4 сек → sleepy (засыпает)
             switch (currentDirection) {
             case Back:  key = "back_sleepy"; break;
             case Front: key = "front_sleepy"; break;
@@ -156,21 +207,36 @@ void MainWindow::updateAnimation()
 
     if (!key.isEmpty()) {
         characterLabel->setPixmap(sprites[key]);
+    }
+    // Движение
+    QPoint pos = characterLabel->pos();
+    int speed = 7;
+    if (isWalking) {
+        if (currentDirection == Back)  pos.setY(pos.y() - speed);
+        if (currentDirection == Front) pos.setY(pos.y() + speed);
+        if (currentDirection == Left)  pos.setX(pos.x() - speed);
+        if (currentDirection == Right) pos.setX(pos.x() + speed);
 
-        // Движение
-        QPoint pos = characterLabel->pos();
-        int speed = 7;
-        if (isWalking) {
-            if (currentDirection == Back)  pos.setY(pos.y() - speed);
-            if (currentDirection == Front) pos.setY(pos.y() + speed);
-            if (currentDirection == Left)  pos.setX(pos.x() - speed);
-            if (currentDirection == Right) pos.setX(pos.x() + speed);
+        QRect bounds(0, 0, width() - characterLabel->width(), height() - characterLabel->height());
+        pos.setX(std::clamp(pos.x(), bounds.left(), bounds.right()));
+        pos.setY(std::clamp(pos.y(), bounds.top(), bounds.bottom()));
 
-            QRect bounds(0, 0, width() - characterLabel->width(), height() - characterLabel->height());
-            pos.setX(std::clamp(pos.x(), bounds.left(), bounds.right()));
-            pos.setY(std::clamp(pos.y(), bounds.top(), bounds.bottom()));
+        characterLabel->move(pos);
 
-            characterLabel->move(pos);
         }
+
+    QRect characterRect = characterLabel->geometry();
+    bool insideFrame = false;
+    for (int i = 0; i < 6; ++i) {
+        if (characterRect.intersects(frameRects[i])) {
+            insideFrame = true;
+            break;
+        }
+    }
+
+    if (insideFrame) {
+        buttonELabel->show();
+    } else {
+        buttonELabel->hide();
     }
 }

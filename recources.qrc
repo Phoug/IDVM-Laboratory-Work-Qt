@@ -67,5 +67,12 @@
     </qresource>
     <qresource prefix="/images">
         <file>other/main_background.svg</file>
+        <file>other/frame_lab1.svg</file>
+        <file>other/frame_lab2.svg</file>
+        <file>other/frame_lab3.svg</file>
+        <file>other/frame_lab4.svg</file>
+        <file>other/frame_lab5.svg</file>
+        <file>other/frame_lab6.svg</file>
+        <file>other/button_e.svg</file>
     </qresource>
 </RCC>
