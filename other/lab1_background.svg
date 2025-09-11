@@ -1,0 +1,44 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_n_31_114)">
+<rect width="600" height="400" fill="#D9D9D9"/>
+</g>
+<path d="M25 374L62 342V374L91.5 342" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M101 253L138 221V253L167.5 221" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M245 327L282 295V327L311.5 295" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M400 221L437 189V221L466.5 189" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M10 88L47 56V88L76.5 56" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M233 133L270 101V133L299.5 101" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M467 56L504 24V56L533.5 24" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M516 304L553 272V304L582.5 272" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M367 374L404 342V374L433.5 342" stroke="#CBCDCB" stroke-width="6" stroke-linecap="round"/>
+<path d="M536.124 380.502L553.871 367.5" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M189.984 235.843L205.776 251.159" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M500 88L515.793 103.316" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M101.255 28.7464L98.5411 50.5784" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M35.7135 305L33 326.832" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M498.953 216.776L513.758 233.048" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M324 64L338.805 80.2729" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M271 365L285.805 381.273" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M104.322 152.844L82.4766 155.446" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M321.949 166.01L303.901 178.59" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M168.049 342L150 354.58" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<path d="M233.049 29L215 41.5798" stroke="white" stroke-width="6" stroke-linecap="round"/>
+<defs>
+<filter id="filter0_n_31_114" x="0" y="0" width="600" height="400" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="1 1" stitchTiles="stitch" numOctaves="3" result="noise" seed="9206" />
+<feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+<feComponentTransfer in="alphaNoise" result="coloredNoise1">
+<feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feFlood flood-color="rgba(0, 0, 0, 0.25)" result="color1Flood" />
+<feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
+<feMerge result="effect1_noise_31_114">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+</defs>
+</svg>

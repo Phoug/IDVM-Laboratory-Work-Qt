@@ -139,6 +139,24 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_S: currentDirection = Front; isWalking = true; break;
     case Qt::Key_A: currentDirection = Left;  isWalking = true; break;
     case Qt::Key_D: currentDirection = Right; isWalking = true; break;
+    case Qt::Key_E:
+        if (characterLabel->geometry().intersects(frameRects[0])) { // рамка 1-й лабораторной
+            if (!lab1Window) {
+                lab1Window = new Lab1Window(nullptr);
+
+                connect(lab1Window, &Lab1Window::windowClosed, this, [this]() {
+                    qDebug() << "Окно Лабы 1 закрыто";
+                    characterLabel->show();
+                    lab1Window->deleteLater(); // безопасное удаление
+                    lab1Window = nullptr;
+                });
+            }
+            characterLabel->hide();
+            lab1Window->show();
+            lab1Window->raise();
+            lab1Window->activateWindow();
+        }
+        break;
     }
     idleCounter = 0; // сбрасываем бездействие
 }
@@ -210,7 +228,7 @@ void MainWindow::updateAnimation()
     }
     // Движение
     QPoint pos = characterLabel->pos();
-    int speed = 7;
+    int speed = 15;
     if (isWalking) {
         if (currentDirection == Back)  pos.setY(pos.y() - speed);
         if (currentDirection == Front) pos.setY(pos.y() + speed);

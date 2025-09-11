@@ -64,6 +64,10 @@
         <file>asleepy/right_sleepy_walk3.png</file>
         <file>asleepy/right_аsleepy_calm.png</file>
         <file>asleepy/right_аsleepy_walk2.png</file>
+        <file>battery/no_charge_blink.png</file>
+        <file>battery/no_charge_calm.png</file>
+        <file>battery/charge_blink.png</file>
+        <file>battery/charge_calm.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>other/main_background.svg</file>
@@ -74,5 +78,11 @@
         <file>other/frame_lab5.svg</file>
         <file>other/frame_lab6.svg</file>
         <file>other/button_e.svg</file>
+        <file>other/battery1.svg</file>
+        <file>other/battery2.svg</file>
+        <file>other/battery3.svg</file>
+        <file>other/battery4.svg</file>
+        <file>other/battery5.svg</file>
+        <file>other/lab1_background.svg</file>
     </qresource>
 </RCC>
