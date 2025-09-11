@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QLabel* getCharacterLabel() { return characterLabel; }
     ~MainWindow();
 
 protected:
