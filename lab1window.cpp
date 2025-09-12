@@ -5,6 +5,9 @@
 #include <QProcess>
 #include <QSysInfo>
 #include <QHBoxLayout>
+#include <QFontDatabase>
+#include <QFont>
+#include <QPalette>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -14,6 +17,15 @@ Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
 {
     setWindowTitle("Лабораторная 1: Энергопитание");
     resize(600, 400);
+
+    // === Подключение Kosko Bold ===
+    int fontId = QFontDatabase::addApplicationFont(":/fonts/fonts/KoskoBold-Bold.ttf");
+    QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    QFont koskoFont(fontFamily, 20, QFont::Bold);
+
+    // === Палитра для белого текста ===
+    QPalette whiteText;
+    whiteText.setColor(QPalette::WindowText, Qt::black);
 
     // Фон
     QLabel *backgroundLabel = new QLabel(this);
@@ -42,12 +54,21 @@ Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
     batteryTimeLabel->setFixedWidth(350);
     batteryIconLabel = new QLabel(this);
 
+    // Применяем Kosko Bold + белый текст ко всем QLabel
+    QList<QLabel*> labels = { powerTypeLabel, batteryTypeLabel, batteryLevelLabel,
+                              powerSavingModeLabel, batteryTimeLabel };
+    for (QLabel *lbl : labels) {
+        lbl->setFont(koskoFont);
+        lbl->setPalette(whiteText);
+        lbl->setWordWrap(true);
+    }
+
     infoLayout->addWidget(powerTypeLabel);
     infoLayout->addWidget(batteryTypeLabel);
     infoLayout->addWidget(batteryLevelLabel);
     infoLayout->addWidget(powerSavingModeLabel);
     infoLayout->addWidget(batteryTimeLabel);
-    infoLayout->addWidget(batteryIconLabel);  // добавляем батарею
+    infoLayout->addWidget(batteryIconLabel);
 
     layout->addLayout(infoLayout);
 
@@ -101,14 +122,36 @@ void Lab1Window::updateBatteryInfo()
             batteryTimeLabel->setText(QString("Оставшееся время работы батареи: %1 мин").arg(sps.BatteryLifeTime / 60));
         }
 
-        // --- Выбор картинки батареи ---
         QString batteryPixmap;
         int level = sps.BatteryLifePercent;
-        if (level > 80) batteryPixmap = ":/images/other/battery1.svg";
-        else if (level > 60) batteryPixmap = ":/images/other/battery2.svg";
-        else if (level > 40) batteryPixmap = ":/images/other/battery3.svg";
-        else if (level > 20) batteryPixmap = ":/images/other/battery4.svg";
-        else batteryPixmap = ":/images/other/battery5.svg";
+
+        switch (isCharge) {
+        case true:
+            if (level > 90) batteryPixmap = ":/images/other/battery_charge1.svg";
+            else if (level > 80) batteryPixmap = ":/images/other/battery_charge2.svg";
+            else if (level > 70) batteryPixmap = ":/images/other/battery_charge3.svg";
+            else if (level > 60) batteryPixmap = ":/images/other/battery_charge4.svg";
+            else if (level > 50) batteryPixmap = ":/images/other/battery_charge5.svg";
+            else if (level > 40) batteryPixmap = ":/images/other/battery_charge6.svg";
+            else if (level > 30) batteryPixmap = ":/images/other/battery_charge7.svg";
+            else if (level > 20) batteryPixmap = ":/images/other/battery_charge8.svg";
+            else if (level > 10) batteryPixmap = ":/images/other/battery_charge9.svg";
+            else batteryPixmap = ":/images/other/battery_charge10.svg";
+
+            break;
+        case false:
+            if (level > 90) batteryPixmap = ":/images/other/battery1.svg";
+            else if (level > 80) batteryPixmap = ":/images/other/battery2.svg";
+            else if (level > 70) batteryPixmap = ":/images/other/battery3.svg";
+            else if (level > 60) batteryPixmap = ":/images/other/battery4.svg";
+            else if (level > 50) batteryPixmap = ":/images/other/battery5.svg";
+            else if (level > 40) batteryPixmap = ":/images/other/battery6.svg";
+            else if (level > 30) batteryPixmap = ":/images/other/battery7.svg";
+            else if (level > 20) batteryPixmap = ":/images/other/battery8.svg";
+            else if (level > 10) batteryPixmap = ":/images/other/battery9.svg";
+            else batteryPixmap = ":/images/other/battery10.svg";
+            break;
+        }
 
         batteryIconLabel->setPixmap(QPixmap(batteryPixmap));
         batteryIconLabel->setAlignment(Qt::AlignCenter);

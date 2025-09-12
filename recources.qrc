@@ -78,11 +78,30 @@
         <file>other/frame_lab5.svg</file>
         <file>other/frame_lab6.svg</file>
         <file>other/button_e.svg</file>
+        <file>other/lab1_background.svg</file>
+        <file>other/battery_charge1.svg</file>
+        <file>other/battery_charge2.svg</file>
+        <file>other/battery_charge3.svg</file>
+        <file>other/battery_charge4.svg</file>
+        <file>other/battery_charge5.svg</file>
+        <file>other/battery_charge6.svg</file>
+        <file>other/battery_charge7.svg</file>
+        <file>other/battery_charge8.svg</file>
+        <file>other/battery_charge9.svg</file>
+        <file>other/battery_charge10.svg</file>
         <file>other/battery1.svg</file>
         <file>other/battery2.svg</file>
         <file>other/battery3.svg</file>
         <file>other/battery4.svg</file>
         <file>other/battery5.svg</file>
-        <file>other/lab1_background.svg</file>
+        <file>other/battery6.svg</file>
+        <file>other/battery7.svg</file>
+        <file>other/battery8.svg</file>
+        <file>other/battery9.svg</file>
+        <file>other/battery10.svg</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>fonts/KoskoBold-Bold.ttf</file>
+        <file>fonts/KoskoRegular-Regular.ttf</file>
     </qresource>
 </RCC>
