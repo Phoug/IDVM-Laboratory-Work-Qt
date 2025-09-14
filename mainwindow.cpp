@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     animTimer = new QTimer(this);
     connect(animTimer, &QTimer::timeout, this, &MainWindow::updateAnimation);
-    animTimer->start(50);
+    animTimer->start(25);
 
     // --- добавляем рамки лабораторных ---
     frameLab1 = new QLabel(central);
@@ -140,22 +140,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_A: currentDirection = Left;  isWalking = true; break;
     case Qt::Key_D: currentDirection = Right; isWalking = true; break;
     case Qt::Key_E:
-        if (characterLabel->geometry().intersects(frameRects[0])) { // рамка 1-й лабораторной
-            if (!lab1Window) {
-                lab1Window = new Lab1Window(nullptr);
-
-                connect(lab1Window, &Lab1Window::windowClosed, this, [this]() {
-                    qDebug() << "Окно Лабы 1 закрыто";
-                    characterLabel->show();
-                    lab1Window->deleteLater(); // безопасное удаление
-                    lab1Window = nullptr;
-                });
-            }
-            characterLabel->hide();
-            lab1Window->show();
-            lab1Window->raise();
-            lab1Window->activateWindow();
-        }
+        openLabWindow(frameRects[0], lab1Window);
+        openLabWindow(frameRects[1], lab2Window);
         break;
     }
     idleCounter = 0; // сбрасываем бездействие
@@ -193,7 +179,7 @@ void MainWindow::updateAnimation()
         idleCounter++;
 
         // каждые ~20 кадров = 1 сек при таймере 50 мс
-        if (idleCounter < 30) {
+        if (idleCounter < 45) {
             // первые 2 секунды calm
             switch (currentDirection) {
             case Back:  key = "back_calm"; break;
@@ -202,7 +188,7 @@ void MainWindow::updateAnimation()
             case Right: key = "right_calm"; break;
             default:    key = "front_calm"; break;
             }
-        } else if (idleCounter < 80) {
+        } else if (idleCounter < 120) {
             // 2–4 сек → моргаем asleepy
             switch (currentDirection) {
             case Back:  key = (idleCounter % 40 < 20) ? "back_calm" : "back_asleepy"; break;
@@ -228,7 +214,7 @@ void MainWindow::updateAnimation()
     }
     // Движение
     QPoint pos = characterLabel->pos();
-    int speed = 15;
+    int speed = 5;
     if (isWalking) {
         if (currentDirection == Back)  pos.setY(pos.y() - speed);
         if (currentDirection == Front) pos.setY(pos.y() + speed);

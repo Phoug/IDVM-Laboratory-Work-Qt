@@ -1,8 +1,11 @@
 QT       += core gui
+LIBS     += -lpowrprof
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
+win32:LIBS += -lsetupapi
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -10,12 +13,14 @@ CONFIG += c++17
 
 SOURCES += \
     lab1window.cpp \
+    lab2window.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     define.h \
     lab1window.h \
+    lab2window.h \
     mainwindow.h
 
 FORMS += \

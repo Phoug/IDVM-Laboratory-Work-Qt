@@ -10,6 +10,7 @@
 
 #include "define.h"
 #include "lab1window.h"
+#include "lab2window.h"
 
 class MainWindow : public QMainWindow
 {
@@ -48,7 +49,31 @@ private:
     QRect frameRects[NUMBERS_OF_LAB_FRAMES];
     QLabel *buttonELabel;
 
-    Lab1Window *lab1Window;
+    Lab1Window *lab1Window = nullptr;
+    Lab2Window *lab2Window = nullptr;
+
+    template<typename T>
+    void openLabWindow(QRect frameRect, T *&labWindow)
+    {
+        if (characterLabel->geometry().intersects(frameRect)) {
+            if (!labWindow) {
+                labWindow = new T(nullptr);
+                connect(labWindow, &T::windowClosed, this, [this, &labWindow]() {
+                    characterLabel->show();
+                    if (labWindow) {
+                        labWindow->deleteLater();
+                        labWindow = nullptr;
+                    }
+                });
+            }
+            characterLabel->hide();
+            labWindow->show();
+            labWindow->raise();
+            labWindow->activateWindow();
+        }
+    }
 };
+
+
 
 #endif // MAINWINDOW_H

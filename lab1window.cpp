@@ -1,33 +1,19 @@
 #include "lab1window.h"
-#include <QApplication>
-#include <QDebug>
-#include <QOperatingSystemVersion>
-#include <QProcess>
-#include <QSysInfo>
-#include <QHBoxLayout>
-#include <QFontDatabase>
-#include <QFont>
-#include <QPalette>
 
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
-
-Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
+Lab1Window::Lab1Window(QWidget *parent) : QWidget(parent)
 {
     setWindowTitle("Лабораторная 1: Энергопитание");
-    resize(600, 400);
+    resize(LAB1_SCREEN_WEIGHT, LAB1_SCREEN_HEIGHT);
 
-    // === Подключение Kosko Bold ===
+    // Шрифт Kosko Bold
     int fontId = QFontDatabase::addApplicationFont(":/fonts/fonts/KoskoBold-Bold.ttf");
     QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
     QFont koskoFont(fontFamily, 20, QFont::Bold);
 
-    // === Палитра для белого текста ===
-    QPalette whiteText;
-    whiteText.setColor(QPalette::WindowText, Qt::black);
+    QPalette blackText;
+    blackText.setColor(QPalette::WindowText, Qt::black);
 
-    // Фон
+    // Фоновый лейбл
     QLabel *backgroundLabel = new QLabel(this);
     backgroundLabel->setPixmap(QPixmap(":/images/other/lab1_background.svg"));
     backgroundLabel->setScaledContents(true);
@@ -37,15 +23,15 @@ Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
     // Основной layout
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-    // --- Персонаж слева ---
+    // Персонаж
     characterLabel = new QLabel(this);
-    characterLabel->setFixedSize(60, 82);
+    characterLabel->setFixedSize(120, 164);
     characterLabel->setScaledContents(true);
+    layout->addStretch();
     layout->addWidget(characterLabel);
 
-    // --- Информационный блок справа ---
+    // --- Информационный блок ---
     QVBoxLayout *infoLayout = new QVBoxLayout();
-
     powerTypeLabel = new QLabel(this);
     batteryTypeLabel = new QLabel(this);
     batteryLevelLabel = new QLabel(this);
@@ -54,42 +40,61 @@ Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
     batteryTimeLabel->setFixedWidth(350);
     batteryIconLabel = new QLabel(this);
 
-    // Применяем Kosko Bold + белый текст ко всем QLabel
-    QList<QLabel*> labels = { powerTypeLabel, batteryTypeLabel, batteryLevelLabel,
-                              powerSavingModeLabel, batteryTimeLabel };
-    for (QLabel *lbl : labels) {
+    QList<QLabel*> infoLabels = { powerTypeLabel, batteryTypeLabel, batteryLevelLabel,
+                                  powerSavingModeLabel, batteryTimeLabel };
+    for (QLabel *lbl : infoLabels) {
         lbl->setFont(koskoFont);
-        lbl->setPalette(whiteText);
+        lbl->setPalette(blackText);
         lbl->setWordWrap(true);
     }
 
+    // Кнопки спящий режим и гибернация
+    auto createButton = [koskoFont](const QString &text) {
+        QPushButton *btn = new QPushButton(text);
+        btn->setFont(koskoFont);
+        btn->setStyleSheet(
+            "QPushButton { border: 5px solid black; border-radius: 6px; padding: 6px; background-color: white; color: black; }"
+            "QPushButton:hover { background-color: lightgray; }"
+            "QPushButton:pressed { background-color: black; border: 5px solid white; color: white; }"
+            );
+        return btn;
+    };
+
+    QPushButton *sleepButton = createButton("Спящий режим");
+    QPushButton *hibernateButton = createButton("Гибернация");
+
+    connect(sleepButton, &QPushButton::clicked, this, &Lab1Window::sleepMode);
+    connect(hibernateButton, &QPushButton::clicked, this, &Lab1Window::hibernateMode);
+
+    // Добавление виджетов в layout
     infoLayout->addWidget(powerTypeLabel);
     infoLayout->addWidget(batteryTypeLabel);
     infoLayout->addWidget(batteryLevelLabel);
     infoLayout->addWidget(powerSavingModeLabel);
     infoLayout->addWidget(batteryTimeLabel);
-    infoLayout->addWidget(batteryIconLabel);
+    infoLayout->addWidget(sleepButton);
+    infoLayout->addWidget(hibernateButton);
+    infoLayout->addWidget(batteryIconLabel, 0, Qt::AlignCenter);
 
+    layout->addStretch();
     layout->addLayout(infoLayout);
+    layout->setContentsMargins(10, 10, 10, 10);
+    infoLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Таймер для обновления батареи
+    // Таймер обновления батареи
     updateTimer = new QTimer(this);
     connect(updateTimer, &QTimer::timeout, this, &Lab1Window::updateBatteryInfo);
     updateTimer->start(1000);
 
-    // Таймер для моргания персонажа
+    // Таймер моргания персонажа
     QTimer *blinkTimer = new QTimer(this);
     connect(blinkTimer, &QTimer::timeout, [this]() {
-        static bool blinkState = false;
-        blinkState = !blinkState;
-
-        if (isCharge) {
-            characterLabel->setPixmap(QPixmap(blinkState ? ":/morty/battery/charge_blink.png"
-                                                         : ":/morty/battery/charge_calm.png"));
-        } else {
-            characterLabel->setPixmap(QPixmap(blinkState ? ":/morty/battery/no_charge_blink.png"
-                                                         : ":/morty/battery/no_charge_calm.png"));
-        }
+        static bool blink = false;
+        blink = !blink;
+        const QString basePath = ":/morty/battery/";
+        characterLabel->setPixmap(QPixmap(isCharge ?
+                                              (blink ? basePath + "charge_blink.png" : basePath + "charge_calm.png") :
+                                              (blink ? basePath + "no_charge_blink.png" : basePath + "no_charge_calm.png")));
     });
     blinkTimer->start(500);
 
@@ -98,70 +103,79 @@ Lab1Window::Lab1Window(QWidget *parent): QWidget(parent)
 
 void Lab1Window::closeEvent(QCloseEvent *event)
 {
-    emit windowClosed(); // испускаем сигнал при закрытии окна
-    QWidget::closeEvent(event); // вызываем базовый обработчик
+    emit windowClosed();
+    QWidget::closeEvent(event);
 }
 
 void Lab1Window::updateBatteryInfo()
 {
-#ifdef Q_OS_WIN
     SYSTEM_POWER_STATUS sps;
-    if (GetSystemPowerStatus(&sps)) {
-        isCharge = (sps.ACLineStatus == 1);
+    if (!GetSystemPowerStatus(&sps)) return;
 
-        powerTypeLabel->setText(QString("Источник питания: %1").arg(isCharge ? "Сеть" : "Батарея"));
-        batteryLevelLabel->setText(QString("Уровень заряда: %1%").arg(sps.BatteryLifePercent));
-        powerSavingModeLabel->setText(QString("Режим энергосбережения: %1").arg(sps.SystemStatusFlag ? "Вкл" : "Выкл"));
+    isCharge = (sps.ACLineStatus == 1);
+    powerTypeLabel->setText(QString("Источник питания: %1").arg(isCharge ? "Сеть" : "Батарея"));
+    batteryLevelLabel->setText(QString("Уровень заряда: %1%").arg(sps.BatteryLifePercent));
+    powerSavingModeLabel->setText(QString("Режим энергосбережения: %1").arg(sps.SystemStatusFlag ? "Вкл" : "Выкл"));
 
-        // Время работы батареи
-        if (isCharge && sps.BatteryLifeTime == 0xFFFFFFFF) {
-            batteryTimeLabel->setText("Оставшееся время работы батареи: Ноутбук заряжается");
-        } else if (sps.BatteryLifeTime == 0xFFFFFFFF){
-            batteryTimeLabel->setText("Оставшееся время работы батареи: Расчёт...");
-        }else {
-            batteryTimeLabel->setText(QString("Оставшееся время работы батареи: %1 мин").arg(sps.BatteryLifeTime / 60));
+    // Тип батареи через WMIC
+    auto getBatteryType = []() -> QString {
+        QProcess process;
+        process.start("cmd.exe", { "/c", "wmic PATH Win32_Battery Get Chemistry /value" });
+        process.waitForFinished(-1);
+        QString output = process.readAllStandardOutput();
+        for (const QString &line : output.split(QRegularExpression("[\r\n]+"), Qt::SkipEmptyParts)) {
+            if (line.startsWith("Chemistry=")) {
+                QString code = line.section('=', 1, 1).trimmed();
+                if (code == "3") return "Lead Acid";
+                if (code == "4") return "NiCd";
+                if (code == "5") return "NiMH";
+                if (code == "6") return "Li-ion";
+                if (code == "7") return "Zinc air";
+                if (code == "8") return "Li-Polymer";
+                return "Другое";
+            }
         }
+        return "Неизвестно";
+    };
+    batteryTypeLabel->setText("Тип батареи: " + getBatteryType());
 
-        QString batteryPixmap;
-        int level = sps.BatteryLifePercent;
-
-        switch (isCharge) {
-        case true:
-            if (level > 90) batteryPixmap = ":/images/other/battery_charge1.svg";
-            else if (level > 80) batteryPixmap = ":/images/other/battery_charge2.svg";
-            else if (level > 70) batteryPixmap = ":/images/other/battery_charge3.svg";
-            else if (level > 60) batteryPixmap = ":/images/other/battery_charge4.svg";
-            else if (level > 50) batteryPixmap = ":/images/other/battery_charge5.svg";
-            else if (level > 40) batteryPixmap = ":/images/other/battery_charge6.svg";
-            else if (level > 30) batteryPixmap = ":/images/other/battery_charge7.svg";
-            else if (level > 20) batteryPixmap = ":/images/other/battery_charge8.svg";
-            else if (level > 10) batteryPixmap = ":/images/other/battery_charge9.svg";
-            else batteryPixmap = ":/images/other/battery_charge10.svg";
-
-            break;
-        case false:
-            if (level > 90) batteryPixmap = ":/images/other/battery1.svg";
-            else if (level > 80) batteryPixmap = ":/images/other/battery2.svg";
-            else if (level > 70) batteryPixmap = ":/images/other/battery3.svg";
-            else if (level > 60) batteryPixmap = ":/images/other/battery4.svg";
-            else if (level > 50) batteryPixmap = ":/images/other/battery5.svg";
-            else if (level > 40) batteryPixmap = ":/images/other/battery6.svg";
-            else if (level > 30) batteryPixmap = ":/images/other/battery7.svg";
-            else if (level > 20) batteryPixmap = ":/images/other/battery8.svg";
-            else if (level > 10) batteryPixmap = ":/images/other/battery9.svg";
-            else batteryPixmap = ":/images/other/battery10.svg";
-            break;
-        }
-
-        batteryIconLabel->setPixmap(QPixmap(batteryPixmap));
-        batteryIconLabel->setAlignment(Qt::AlignCenter);
-        batteryIconLabel->setScaledContents(true);
-        batteryIconLabel->setFixedSize(250, 100);
+    // Время работы батареи
+    if (sps.BatteryLifeTime == 0xFFFFFFFF) {
+        batteryTimeLabel->setText(isCharge ? "Оставшееся время работы батареи: Ноутбук заряжается" :
+                                      "Оставшееся время работы батареи: Расчёт...");
+    } else {
+        batteryTimeLabel->setText(QString("Оставшееся время работы батареи: %1 мин").arg(sps.BatteryLifeTime / 60));
     }
-#else
-    powerTypeLabel->setText("Информация недоступна на этой ОС");
-    batteryTimeLabel->setText("");
-    isCharge = true;
+
+    // Определяем функцию получения пути к иконке батареи
+    auto getBatteryIcon = [this, sps]() -> QString {
+        int level = sps.BatteryLifePercent;
+        level = qBound(0, level, 100); // ограничиваем 0-100%
+        int n = 10 - level / 10;       // 0-9 -> 1-10
+        n = qBound(1, n, 10);
+
+        QString base = ":/images/other/";
+        QString suffix = isCharge ? "_charge" : "";
+        return QString("%1battery%2%3.svg").arg(base).arg(suffix).arg(n);
+    };
+
+    // Устанавливаем иконку в QLabel
+    QPixmap pix(getBatteryIcon());
+    batteryIconLabel->setPixmap(pix);
+    batteryIconLabel->setAlignment(Qt::AlignCenter);
+    batteryIconLabel->setScaledContents(true);
+    batteryIconLabel->setFixedSize(250, 100);
+}
+
+void Lab1Window::sleepMode() {
+#ifdef Q_OS_WIN
+    SetSuspendState(FALSE, FALSE, FALSE);
+#endif
+}
+
+void Lab1Window::hibernateMode() {
+#ifdef Q_OS_WIN
+    SetSuspendState(TRUE, FALSE, FALSE);
 #endif
 }
 
