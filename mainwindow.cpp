@@ -5,19 +5,12 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , currentDirection(None)
-    , isWalking(false)
-    , frameIndex(0)
-    , idleCounter(0)
 {
     setFixedSize(1280, 720);
 
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
-    central->setStyleSheet(
-        "background-image: url(:/images/other/main_background.svg);"
-        "background-repeat: no-repeat;"
-        );
+    central->setStyleSheet("background-image: url(:/images/other/main_background.svg); background-repeat: no-repeat;");
 
     characterLabel = new QLabel(central);
     characterLabel->setGeometry(640, 180, 60, 82);
@@ -25,92 +18,36 @@ MainWindow::MainWindow(QWidget *parent)
     characterLabel->setStyleSheet("background: transparent;");
     characterLabel->show();
 
-    // Загружаем спрайты (обычные)
-    sprites["back_calm"]   = QPixmap(":/morty/simple/back_calm.png");
-    sprites["back_walk1"]  = QPixmap(":/morty/simple/back_walk1.png");
-    sprites["back_walk2"]  = QPixmap(":/morty/simple/back_walk2.png");
-    sprites["back_walk3"]  = QPixmap(":/morty/simple/back_walk3.png");
+    loadSpritesFromFolder("simple", {"back_calm","back_walk1","back_walk2","back_walk3",
+                                     "front_calm","front_walk1","front_walk2","front_walk3",
+                                     "left_calm","left_walk1","left_walk2","left_walk3",
+                                     "right_calm","right_walk1","right_walk2","right_walk3"});
+    loadSpritesFromFolder("asleepy", {"front_asleepy_calm","back_asleepy_calm","left_asleepy_calm","right_asleepy_calm"});
+    loadSpritesFromFolder("sleepy",  {"front_sleepy_calm","back_sleepy_calm","left_sleepy_calm","right_sleepy_calm"});
 
-    sprites["front_calm"]  = QPixmap(":/morty/simple/front_calm.png");
-    sprites["front_walk1"] = QPixmap(":/morty/simple/front_walk1.png");
-    sprites["front_walk2"] = QPixmap(":/morty/simple/front_walk2.png");
-    sprites["front_walk3"] = QPixmap(":/morty/simple/front_walk3.png");
-
-    sprites["left_calm"]   = QPixmap(":/morty/simple/left_calm.png");
-    sprites["left_walk1"]  = QPixmap(":/morty/simple/left_walk1.png");
-    sprites["left_walk2"]  = QPixmap(":/morty/simple/left_walk2.png");
-    sprites["left_walk3"]  = QPixmap(":/morty/simple/left_walk3.png");
-
-    sprites["right_calm"]  = QPixmap(":/morty/simple/right_calm.png");
-    sprites["right_walk1"] = QPixmap(":/morty/simple/right_walk1.png");
-    sprites["right_walk2"] = QPixmap(":/morty/simple/right_walk2.png");
-    sprites["right_walk3"] = QPixmap(":/morty/simple/right_walk3.png");
-
-    // Idle (моргает и засыпает)
-    sprites["front_asleepy"] = QPixmap(":/morty/asleepy/front_аsleepy_calm.png");
-    sprites["back_asleepy"]  = QPixmap(":/morty/asleepy/back_аsleepy_calm.png");
-    sprites["left_asleepy"]  = QPixmap(":/morty/asleepy/left_аsleepy_calm.png");
-    sprites["right_asleepy"] = QPixmap(":/morty/asleepy/right_аsleepy_calm.png");
-
-    sprites["front_sleepy"] = QPixmap(":/morty/sleepy/front_sleepy_calm.png");
-    sprites["back_sleepy"]  = QPixmap(":/morty/sleepy/bacl_sleepy_calm.png");
-    sprites["left_sleepy"]  = QPixmap(":/morty/sleepy/left_sleepy_calm.png");
-    sprites["right_sleepy"] = QPixmap(":/morty/sleepy/right_sleepy_calm.png");
 
     characterLabel->setPixmap(sprites["front_sleepy"]);
 
     animTimer = new QTimer(this);
     connect(animTimer, &QTimer::timeout, this, &MainWindow::updateAnimation);
-    animTimer->start(25);
+    animTimer->start(35);
 
-    // --- добавляем рамки лабораторных ---
-    frameLab1 = new QLabel(central);
-    frameLab1->setPixmap(QPixmap(":/images/other/frame_lab1.svg"));
-    frameLab1->setGeometry(5, 5, 250, 180);   // левая колонка сверху
-    frameLab1->setScaledContents(true);
-    frameLab1->setStyleSheet("background: transparent");
-
-    frameLab2 = new QLabel(central);
-    frameLab2->setPixmap(QPixmap(":/images/other/frame_lab2.svg"));
-    frameLab2->setGeometry(5, 190, 250, 180);   // левая колонка по центру
-    frameLab2->setScaledContents(true);
-    frameLab2->setStyleSheet("background: transparent");
-
-    frameLab3 = new QLabel(central);
-    frameLab3->setPixmap(QPixmap(":/images/other/frame_lab3.svg"));
-    frameLab3->setGeometry(5, 380, 250, 180);   // левая колонка снизу
-    frameLab3->setScaledContents(true);
-    frameLab3->setStyleSheet("background: transparent");
-
-    frameLab4 = new QLabel(central);
-    frameLab4->setPixmap(QPixmap(":/images/other/frame_lab4.svg"));
-    frameLab4->setGeometry(1020, 5, 250, 180); // правая колонка сверху
-    frameLab4->setScaledContents(true);
-    frameLab4->setStyleSheet("background: transparent");
-
-    frameLab5 = new QLabel(central);
-    frameLab5->setPixmap(QPixmap(":/images/other/frame_lab5.svg"));
-    frameLab5->setGeometry(1020, 190, 250, 180); // правая колонка по центру
-    frameLab5->setScaledContents(true);
-    frameLab5->setStyleSheet("background: transparent");
-
-    frameLab6 = new QLabel(central);
-    frameLab6->setPixmap(QPixmap(":/images/other/frame_lab6.svg"));
-    frameLab6->setGeometry(1020, 380, 250, 180); // правая колонка снизу
-    frameLab6->setScaledContents(true);
-    frameLab6->setStyleSheet("background: transparent");
-
-    frameRects[0] = frameLab1->geometry();
-    frameRects[1] = frameLab2->geometry();
-    frameRects[2] = frameLab3->geometry();
-    frameRects[3] = frameLab4->geometry();
-    frameRects[4] = frameLab5->geometry();
-    frameRects[5] = frameLab6->geometry();
+    QStringList frames = {"frame_lab1","frame_lab2","frame_lab3","frame_lab4","frame_lab5","frame_lab6"};
+    QList<QRect> geometries = {QRect(5,5,250,180), QRect(5,190,250,180), QRect(5,380,250,180),
+                               QRect(1020,5,250,180), QRect(1020,190,250,180), QRect(1020,380,250,180)};
+    for (int i = 0; i < frames.size(); ++i) {
+        frameLab[i] = new QLabel(central);
+        frameLab[i]->setPixmap(QPixmap(":/images/other/" + frames[i] + ".svg"));
+        frameLab[i]->setGeometry(geometries[i]);
+        frameLab[i]->setScaledContents(true);
+        frameLab[i]->setStyleSheet("background: transparent");
+        frameRects[i] = frameLab[i]->geometry();
+    }
 
     buttonELabel = new QLabel(central);
     buttonELabel->setPixmap(QPixmap(":/images/other/button_e.svg"));
     buttonELabel->setScaledContents(true);
-    buttonELabel->setGeometry(590, 605, 100, 100); // правая колонка снизу
+    buttonELabel->setGeometry(590, 605, 100, 100);
     buttonELabel->hide();
 
     characterLabel->raise();
@@ -140,107 +77,138 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_A: currentDirection = Left;  isWalking = true; break;
     case Qt::Key_D: currentDirection = Right; isWalking = true; break;
     case Qt::Key_E:
-        openLabWindow(frameRects[0], lab1Window);
-        openLabWindow(frameRects[1], lab2Window);
+        for (int i=0; i<NUMBERS_OF_LAB_FRAMES; ++i) {
+            if (characterLabel->geometry().intersects(frameRects[i])) {
+                if (i == 0) openLabWindow(frameRects[i], lab1Window);
+                if (i == 1) openLabWindow(frameRects[i], lab2Window);
+            }
+        }
         break;
     }
-    idleCounter = 0; // сбрасываем бездействие
+    idleCounter = 0;
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key()) {
-    case Qt::Key_W:
-    case Qt::Key_S:
-    case Qt::Key_A:
-    case Qt::Key_D:
+    case Qt::Key_W: case Qt::Key_S: case Qt::Key_A: case Qt::Key_D:
         isWalking = false;
         break;
-    default:
-        QMainWindow::keyReleaseEvent(event);
+    default: QMainWindow::keyReleaseEvent(event);
     }
 }
 
 void MainWindow::updateAnimation()
 {
     QString key;
-
     if (isWalking) {
-        idleCounter = 0; // сбрасываем счётчик
+        idleCounter = 0;
         frameIndex = (frameIndex + 1) % 3;
         switch (currentDirection) {
         case Back:  key = QString("back_walk%1").arg(frameIndex+1); break;
         case Front: key = QString("front_walk%1").arg(frameIndex+1); break;
         case Left:  key = QString("left_walk%1").arg(frameIndex+1); break;
         case Right: key = QString("right_walk%1").arg(frameIndex+1); break;
-        default: break;
+        default: key = "front_calm"; break;
         }
     } else {
         idleCounter++;
-
-        // каждые ~20 кадров = 1 сек при таймере 50 мс
-        if (idleCounter < 45) {
-            // первые 2 секунды calm
-            switch (currentDirection) {
-            case Back:  key = "back_calm"; break;
-            case Front: key = "front_calm"; break;
-            case Left:  key = "left_calm"; break;
-            case Right: key = "right_calm"; break;
-            default:    key = "front_calm"; break;
-            }
-        } else if (idleCounter < 120) {
-            // 2–4 сек → моргаем asleepy
-            switch (currentDirection) {
-            case Back:  key = (idleCounter % 40 < 20) ? "back_calm" : "back_asleepy"; break;
-            case Front: key = (idleCounter % 40 < 20) ? "front_calm" : "front_asleepy"; break;
-            case Left:  key = (idleCounter % 40 < 20) ? "left_calm" : "left_asleepy"; break;
-            case Right: key = (idleCounter % 40 < 20) ? "right_calm" : "right_asleepy"; break;
-            default:    key = "front_calm"; break;
-            }
-        } else {
-            // больше 4 сек → sleepy (засыпает)
-            switch (currentDirection) {
-            case Back:  key = "back_sleepy"; break;
-            case Front: key = "front_sleepy"; break;
-            case Left:  key = "left_sleepy"; break;
-            case Right: key = "right_sleepy"; break;
-            default:    key = "front_sleepy"; break;
-            }
-        }
+        if (idleCounter < 45) key = getCalmSprite();
+        else if (idleCounter < 120) key = getAsleepySprite();
+        else key = getSleepySprite();
     }
 
-    if (!key.isEmpty()) {
+    if (!key.isEmpty() && sprites.contains(key))
         characterLabel->setPixmap(sprites[key]);
+
+    moveCharacter();
+    updateButtonE();
+}
+
+QString MainWindow::getCalmSprite() const
+{
+    switch (currentDirection) {
+    case Back: return "back_calm";
+    case Front: return "front_calm";
+    case Left: return "left_calm";
+    case Right: return "right_calm";
+    default: return "front_calm";
     }
-    // Движение
-    QPoint pos = characterLabel->pos();
+}
+
+QString MainWindow::getAsleepySprite() const
+{
+    bool blink = (idleCounter % 40 >= 20);
+    switch (currentDirection) {
+    case Back:  return blink ? "back_asleepy_calm"  : "back_calm";
+    case Front: return blink ? "front_asleepy_calm" : "front_calm";
+    case Left:  return blink ? "left_asleepy_calm"  : "left_calm";
+    case Right: return blink ? "right_asleepy_calm" : "right_calm";
+    default:    return blink ? "front_asleepy_calm" : "front_calm"; // fallback
+    }
+}
+
+QString MainWindow::getSleepySprite() const
+{
+    switch (currentDirection) {
+    case Back:  return "back_sleepy_calm";
+    case Front: return "front_sleepy_calm";
+    case Left:  return "left_sleepy_calm";
+    case Right: return "right_sleepy_calm";
+    default:    return "front_sleepy_calm"; // fallback
+    }
+}
+
+
+void MainWindow::moveCharacter()
+{
+    if (!isWalking) return;
+
     int speed = 5;
-    if (isWalking) {
-        if (currentDirection == Back)  pos.setY(pos.y() - speed);
-        if (currentDirection == Front) pos.setY(pos.y() + speed);
-        if (currentDirection == Left)  pos.setX(pos.x() - speed);
-        if (currentDirection == Right) pos.setX(pos.x() + speed);
+    QPoint pos = characterLabel->pos();
+    switch (currentDirection) {
+    case Back:  pos.setY(pos.y()-speed); break;
+    case Front: pos.setY(pos.y()+speed); break;
+    case Left:  pos.setX(pos.x()-speed); break;
+    case Right: pos.setX(pos.x()+speed); break;
+    default: break;
+    }
+    QRect bounds(0, 0, width()-characterLabel->width(), height()-characterLabel->height());
+    pos.setX(std::clamp(pos.x(), bounds.left(), bounds.right()));
+    pos.setY(std::clamp(pos.y(), bounds.top(), bounds.bottom()));
+    characterLabel->move(pos);
+}
 
-        QRect bounds(0, 0, width() - characterLabel->width(), height() - characterLabel->height());
-        pos.setX(std::clamp(pos.x(), bounds.left(), bounds.right()));
-        pos.setY(std::clamp(pos.y(), bounds.top(), bounds.bottom()));
-
-        characterLabel->move(pos);
-
-        }
-
-    QRect characterRect = characterLabel->geometry();
+void MainWindow::updateButtonE()
+{
+    QRect charRect = characterLabel->geometry();
     bool insideFrame = false;
-    for (int i = 0; i < 6; ++i) {
-        if (characterRect.intersects(frameRects[i])) {
-            insideFrame = true;
-            break;
-        }
+    for (int i=0; i<NUMBERS_OF_LAB_FRAMES; ++i) {
+        if (charRect.intersects(frameRects[i])) { insideFrame = true; break; }
     }
+    buttonELabel->setVisible(insideFrame);
+}
 
-    if (insideFrame) {
-        buttonELabel->show();
-    } else {
-        buttonELabel->hide();
+void MainWindow::loadSpritesFromFolder(const QString &folder, const QStringList &keys)
+{
+    for (const auto &k : keys)
+        sprites[k] = QPixmap(QString(":/morty/%1/%2.png").arg(folder, k));
+}
+
+template<typename T>
+void MainWindow::openLabWindow(const QRect &frameRect, T *&labWindow)
+{
+    if (!characterLabel->geometry().intersects(frameRect)) return;
+
+    if (!labWindow) {
+        labWindow = new T(nullptr);
+        connect(labWindow, &T::windowClosed, this, [this, &labWindow]() {
+            characterLabel->show();
+            if (labWindow) { labWindow->deleteLater(); labWindow = nullptr; }
+        });
     }
+    characterLabel->hide();
+    labWindow->show();
+    labWindow->raise();
+    labWindow->activateWindow();
 }

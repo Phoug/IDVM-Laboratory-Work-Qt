@@ -32,10 +32,10 @@
         <file>energy/right_energy_walk1.png</file>
         <file>energy/right_energy_walk2.png</file>
         <file>energy/right_energy_walk3.png</file>
-        <file>sleepy/bacl_sleepy_calm.png</file>
-        <file>sleepy/bacl_sleepy_walk1.png</file>
-        <file>sleepy/bacl_sleepy_walk2.png</file>
-        <file>sleepy/bacl_sleepy_walk3.png</file>
+        <file>sleepy/back_sleepy_calm.png</file>
+        <file>sleepy/back_sleepy_walk1.png</file>
+        <file>sleepy/back_sleepy_walk2.png</file>
+        <file>sleepy/back_sleepy_walk3.png</file>
         <file>sleepy/front_sleepy_calm.png</file>
         <file>sleepy/front_sleepy_walk1.png</file>
         <file>sleepy/front_sleepy_walk2.png</file>
@@ -48,22 +48,22 @@
         <file>sleepy/right_sleepy_walk1.png</file>
         <file>sleepy/right_sleepy_walk2.png</file>
         <file>sleepy/right_sleepy_walk3.png</file>
-        <file>asleepy/back_аsleepy_calm.png</file>
-        <file>asleepy/back_аsleepy_walk1.png</file>
-        <file>asleepy/back_аsleepy_walk2.png</file>
-        <file>asleepy/back_аsleepy_walk3.png</file>
-        <file>asleepy/front_sleepy_walk3.png</file>
-        <file>asleepy/front_аsleepy_calm.png</file>
-        <file>asleepy/front_аsleepy_walk1.png</file>
-        <file>asleepy/front_аsleepy_walk2.png</file>
-        <file>asleepy/left_аsleepy_calm.png</file>
-        <file>asleepy/left_аsleepy_walk1.png</file>
-        <file>asleepy/left_аsleepy_walk2.png</file>
-        <file>asleepy/left_аsleepy_walk3.png</file>
-        <file>asleepy/right_sleepy_walk1.png</file>
-        <file>asleepy/right_sleepy_walk3.png</file>
-        <file>asleepy/right_аsleepy_calm.png</file>
-        <file>asleepy/right_аsleepy_walk2.png</file>
+        <file>asleepy/back_asleepy_calm.png</file>
+        <file>asleepy/back_asleepy_walk1.png</file>
+        <file>asleepy/back_asleepy_walk2.png</file>
+        <file>asleepy/back_asleepy_walk3.png</file>
+        <file>asleepy/front_asleepy_walk3.png</file>
+        <file>asleepy/front_asleepy_calm.png</file>
+        <file>asleepy/front_asleepy_walk1.png</file>
+        <file>asleepy/front_asleepy_walk2.png</file>
+        <file>asleepy/left_asleepy_calm.png</file>
+        <file>asleepy/left_asleepy_walk1.png</file>
+        <file>asleepy/left_asleepy_walk2.png</file>
+        <file>asleepy/left_asleepy_walk3.png</file>
+        <file>asleepy/right_asleepy_walk1.png</file>
+        <file>asleepy/right_asleepy_walk3.png</file>
+        <file>asleepy/right_asleepy_calm.png</file>
+        <file>asleepy/right_asleepy_walk2.png</file>
         <file>battery/no_charge_blink.png</file>
         <file>battery/no_charge_calm.png</file>
         <file>battery/charge_blink.png</file>
