@@ -30,6 +30,7 @@ private slots:
     void updateAnimation();
 
 private:
+    enum CharacterState { Idle, Walking, Jumping, Escaping, OpeningLab };
     enum Direction { None, Back, Front, Left, Right };
     Direction currentDirection = None;
     bool isWalking = false;
@@ -47,7 +48,14 @@ private:
     Lab1Window *lab1Window = nullptr;
     Lab2Window *lab2Window = nullptr;
 
-    // --- функции для анимации ---
+    CharacterState charState = Idle;
+
+    int jumpStep = 0;   // шаги прыжка
+    int escapeStep = 0; // шаги побега
+    int escapeFrameIndex = 0;
+    int escapeFrameInterval = 2;
+
+    // функции для анимации
     QString getCalmSprite() const;
     QString getAsleepySprite() const;
     QString getSleepySprite() const;

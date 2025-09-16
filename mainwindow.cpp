@@ -7,13 +7,13 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setFixedSize(1280, 720);
-
+    setWindowTitle("Основное окно");
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
     central->setStyleSheet("background-image: url(:/images/other/main_background.svg); background-repeat: no-repeat;");
 
     characterLabel = new QLabel(central);
-    characterLabel->setGeometry(640, 180, 60, 82);
+    characterLabel->setGeometry(610, 220, 60, 82);
     characterLabel->setScaledContents(true);
     characterLabel->setStyleSheet("background: transparent;");
     characterLabel->show();
@@ -77,10 +77,16 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_A: currentDirection = Left;  isWalking = true; break;
     case Qt::Key_D: currentDirection = Right; isWalking = true; break;
     case Qt::Key_E:
-        for (int i=0; i<NUMBERS_OF_LAB_FRAMES; ++i) {
+        for (int i=0; i < NUMBERS_OF_LAB_FRAMES; ++i) {
             if (characterLabel->geometry().intersects(frameRects[i])) {
                 if (i == 0) openLabWindow(frameRects[i], lab1Window);
-                if (i == 1) openLabWindow(frameRects[i], lab2Window);
+                if (i == 1)
+                {
+                    if (charState == Idle || charState == Walking) {
+                        charState = Jumping;
+                        jumpStep = 0;
+                    }
+                }
             }
         }
         break;
@@ -100,30 +106,64 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::updateAnimation()
 {
-    QString key;
-    if (isWalking) {
-        idleCounter = 0;
-        frameIndex = (frameIndex + 1) % 3;
-        switch (currentDirection) {
-        case Back:  key = QString("back_walk%1").arg(frameIndex+1); break;
-        case Front: key = QString("front_walk%1").arg(frameIndex+1); break;
-        case Left:  key = QString("left_walk%1").arg(frameIndex+1); break;
-        case Right: key = QString("right_walk%1").arg(frameIndex+1); break;
-        default: key = "front_calm"; break;
+    if (charState == Jumping) {
+        currentDirection = Front;
+        QPoint pos = characterLabel->pos();
+        if (jumpStep < 10) pos.setY(pos.y() - 6);       // вверх
+        else if (jumpStep < 20) pos.setY(pos.y() + 6);  // вниз
+        characterLabel->move(pos);
+
+        jumpStep++;
+        if (jumpStep >= 20) {
+            charState = Escaping;
+            escapeStep = 0;
+        }
+    }
+    else if (charState == Escaping) {
+        QPoint pos = characterLabel->pos();
+        pos.setX(pos.x() - 8);
+        characterLabel->move(pos);
+
+        // Анимация ходьбы влево
+        if (escapeStep % escapeFrameInterval == 0) {
+            escapeFrameIndex = (escapeFrameIndex + 1) % 3;
+            QString key = QString("left_walk%1").arg(escapeFrameIndex + 1);
+            if (sprites.contains(key))
+                characterLabel->setPixmap(sprites[key]);
+        }
+
+        escapeStep++;
+        if (escapeStep > 40) {
+            charState = OpeningLab;
+            openLabWindow(frameRects[1], lab2Window);
         }
     } else {
-        idleCounter++;
-        if (idleCounter < 45) key = getCalmSprite();
-        else if (idleCounter < 120) key = getAsleepySprite();
-        else key = getSleepySprite();
+        QString key;
+        if (isWalking && charState != Jumping) {
+            idleCounter = 0;
+            frameIndex = (frameIndex + 1) % 3;
+            switch (currentDirection) {
+            case Back:  key = QString("back_walk%1").arg(frameIndex+1); break;
+            case Front: key = QString("front_walk%1").arg(frameIndex+1); break;
+            case Left:  key = QString("left_walk%1").arg(frameIndex+1); break;
+            case Right: key = QString("right_walk%1").arg(frameIndex+1); break;
+            default: key = "front_calm"; break;
+            }
+        } else {
+            idleCounter++;
+            if (idleCounter < 45) key = getCalmSprite();
+            else if (idleCounter < 120) key = getAsleepySprite();
+            else key = getSleepySprite();
+        }
+
+        if (!key.isEmpty() && sprites.contains(key))
+            characterLabel->setPixmap(sprites[key]);
+
+        moveCharacter();
+        updateButtonE();
     }
-
-    if (!key.isEmpty() && sprites.contains(key))
-        characterLabel->setPixmap(sprites[key]);
-
-    moveCharacter();
-    updateButtonE();
 }
+
 
 QString MainWindow::getCalmSprite() const
 {
@@ -164,7 +204,7 @@ void MainWindow::moveCharacter()
 {
     if (!isWalking) return;
 
-    int speed = 5;
+    int speed = 7;
     QPoint pos = characterLabel->pos();
     switch (currentDirection) {
     case Back:  pos.setY(pos.y()-speed); break;
@@ -198,12 +238,12 @@ void MainWindow::loadSpritesFromFolder(const QString &folder, const QStringList 
 template<typename T>
 void MainWindow::openLabWindow(const QRect &frameRect, T *&labWindow)
 {
-    if (!characterLabel->geometry().intersects(frameRect)) return;
-
     if (!labWindow) {
         labWindow = new T(nullptr);
         connect(labWindow, &T::windowClosed, this, [this, &labWindow]() {
             characterLabel->show();
+            characterLabel->setGeometry(610, 220, 60, 82);
+            charState = Idle;
             if (labWindow) { labWindow->deleteLater(); labWindow = nullptr; }
         });
     }

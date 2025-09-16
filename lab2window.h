@@ -21,7 +21,6 @@
 struct PciDeviceInfo {
     QString vendor;
     QString device;
-    QString hwid;
     QString instanceId;
     QString friendlyName;
 };

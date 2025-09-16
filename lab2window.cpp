@@ -6,7 +6,7 @@
 Lab2Window::Lab2Window(QWidget *parent)
     : QMainWindow(parent)
 {
-    // --- Таблица устройств ---
+
     table = new QTableWidget(this);
     setCentralWidget(table);
     table->setColumnCount(4);
@@ -26,7 +26,6 @@ Lab2Window::Lab2Window(QWidget *parent)
     setWindowTitle("Лабораторная 2: Конфигурационное пространство PCI");
     resize(1280, 571);
 
-    // --- Персонаж ---
     characterLabel = new QLabel(this);
     characterLabel->setGeometry(0, 360, 60, 82);
     characterLabel->setScaledContents(true);
@@ -55,7 +54,6 @@ void Lab2Window::closeEvent(QCloseEvent *event) {
     QMainWindow::closeEvent(event);
 }
 
-// --- Анимация персонажа ---
 void Lab2Window::updateAnimation() {
     int speed = 5;
     QPoint pos = characterLabel->pos();
@@ -80,7 +78,6 @@ void Lab2Window::updateAnimation() {
     characterLabel->move(pos);
 }
 
-// --- Вспомогательная функция для MULTI_SZ ---
 static std::vector<std::string> splitMultiSz(const std::vector<char>& buf) {
     std::vector<std::string> out;
     size_t i = 0;
@@ -92,10 +89,12 @@ static std::vector<std::string> splitMultiSz(const std::vector<char>& buf) {
     return out;
 }
 
-// --- Получение PCI устройств ---
+// Получение PCI устройств
 QVector<PciDeviceInfo> Lab2Window::enumeratePciDevices() {
     QVector<PciDeviceInfo> list;
+
 #ifdef Q_OS_WIN
+
     HDEVINFO devInfo = SetupDiGetClassDevsA(nullptr, nullptr, nullptr, DIGCF_ALLCLASSES | DIGCF_PRESENT);
     if (devInfo == INVALID_HANDLE_VALUE) return list;
 
@@ -140,7 +139,7 @@ QVector<PciDeviceInfo> Lab2Window::enumeratePciDevices() {
                                               (PBYTE)friendly, sizeof(friendly), nullptr);
         }
 
-        list.push_back({vendor, device, "", QString::fromLocal8Bit(instanceIdBuf),
+        list.push_back({vendor, device, QString::fromLocal8Bit(instanceIdBuf),
                         QString::fromLocal8Bit(friendly)});
     }
     SetupDiDestroyDeviceInfoList(devInfo);
@@ -148,7 +147,7 @@ QVector<PciDeviceInfo> Lab2Window::enumeratePciDevices() {
     return list;
 }
 
-// --- Заполнение таблицы ---
+// Заполнение таблицы
 void Lab2Window::populateTable(const QVector<PciDeviceInfo> &devices) {
     table->setRowCount(devices.size());
     for (int i = 0; i < devices.size(); ++i) {

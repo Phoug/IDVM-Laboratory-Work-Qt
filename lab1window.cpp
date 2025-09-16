@@ -30,7 +30,7 @@ Lab1Window::Lab1Window(QWidget *parent) : QWidget(parent)
     layout->addStretch();
     layout->addWidget(characterLabel);
 
-    // --- Информационный блок ---
+    // Информационный блок
     QVBoxLayout *infoLayout = new QVBoxLayout();
     powerTypeLabel = new QLabel(this);
     batteryTypeLabel = new QLabel(this);
@@ -148,7 +148,7 @@ void Lab1Window::updateBatteryInfo()
     }
 
     // Определяем функцию получения пути к иконке батареи
-    auto getBatteryIcon = [this, sps]() -> QString {
+    auto getBatteryIcon = [this, sps]() {
         int level = sps.BatteryLifePercent;
         level = qBound(0, level, 100); // ограничиваем 0-100%
         int n = 10 - level / 10;       // 0-9 -> 1-10
@@ -169,7 +169,7 @@ void Lab1Window::updateBatteryInfo()
 
 void Lab1Window::sleepMode() {
 #ifdef Q_OS_WIN
-    SetSuspendState(FALSE, FALSE, FALSE);
+    SetSuspendState(FALSE, FALSE, FALSE); // Hibernate, ForceCritical, DisableWakeEvent
 #endif
 }
 
