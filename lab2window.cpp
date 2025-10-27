@@ -95,9 +95,11 @@ QVector<PciDeviceInfo> Lab2Window::enumeratePciDevices() {
 
 #ifdef Q_OS_WIN
 
+    // Дескрипторы устройтсв
     HDEVINFO devInfo = SetupDiGetClassDevsA(nullptr, nullptr, nullptr, DIGCF_ALLCLASSES | DIGCF_PRESENT);
     if (devInfo == INVALID_HANDLE_VALUE) return list;
 
+    //
     SP_DEVINFO_DATA devData;
     devData.cbSize = sizeof(SP_DEVINFO_DATA);
 

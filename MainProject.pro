@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui widgets multimedia multimediawidgets svg
 LIBS     += -lpowrprof
 
 
@@ -14,6 +14,7 @@ win32:LIBS += -lsetupapi
 SOURCES += \
     lab1window.cpp \
     lab2window.cpp \
+    lab4window.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -21,6 +22,7 @@ HEADERS += \
     define.h \
     lab1window.h \
     lab2window.h \
+    lab4window.h \
     mainwindow.h
 
 FORMS += \

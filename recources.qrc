@@ -68,6 +68,23 @@
         <file>battery/no_charge_calm.png</file>
         <file>battery/charge_blink.png</file>
         <file>battery/charge_calm.png</file>
+        <file>portal/portal_main.gif</file>
+        <file>portal/portal1.png</file>
+        <file>portal/portal2.png</file>
+        <file>portal/portal3.png</file>
+        <file>portal/portal4.png</file>
+        <file>portal/portal5.png</file>
+        <file>portal/portal6.png</file>
+        <file>portal/portal7.png</file>
+        <file>portal/portal8.png</file>
+        <file>portal/portal9.png</file>
+        <file>portal/portal10.png</file>
+        <file>portal/portal11.png</file>
+        <file>loving/loving1.png</file>
+        <file>loving/loving2.png</file>
+        <file>crying/crying1.png</file>
+        <file>crying/crying2.png</file>
+        <file>crying/crying3.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>other/main_background.svg</file>
@@ -99,6 +116,9 @@
         <file>other/battery3.svg</file>
         <file>other/battery4.svg</file>
         <file>other/battery5.svg</file>
+        <file>other/no_video.svg</file>
+        <file>other/no_video_png.png</file>
+        <file>other/lab4_background.svg</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>fonts/KoskoBold-Bold.ttf</file>

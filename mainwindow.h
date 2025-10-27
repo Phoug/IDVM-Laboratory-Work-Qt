@@ -11,6 +11,7 @@
 #include "define.h"
 #include "lab1window.h"
 #include "lab2window.h"
+#include "lab4window.h"
 
 class MainWindow : public QMainWindow
 {
@@ -30,7 +31,7 @@ private slots:
     void updateAnimation();
 
 private:
-    enum CharacterState { Idle, Walking, Jumping, Escaping, OpeningLab };
+    enum CharacterState { Idle, Walking, Jumping, Escaping, OpeningLab, Portal };
     enum Direction { None, Back, Front, Left, Right };
     Direction currentDirection = None;
     bool isWalking = false;
@@ -47,11 +48,12 @@ private:
 
     Lab1Window *lab1Window = nullptr;
     Lab2Window *lab2Window = nullptr;
+    Lab4Window *lab4Window = nullptr;
 
     CharacterState charState = Idle;
 
-    int jumpStep = 0;   // шаги прыжка
-    int escapeStep = 0; // шаги побега
+    int jumpStep = 0;
+    int escapeStep = 0;
     int escapeFrameIndex = 0;
     int escapeFrameInterval = 2;
 

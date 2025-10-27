@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <algorithm>
+#include <QMovie>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -87,6 +88,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                         jumpStep = 0;
                     }
                 }
+                if (i == 3)
+                {
+                    charState = Portal;
+                }
             }
         }
         break;
@@ -109,8 +114,8 @@ void MainWindow::updateAnimation()
     if (charState == Jumping) {
         currentDirection = Front;
         QPoint pos = characterLabel->pos();
-        if (jumpStep < 10) pos.setY(pos.y() - 6);       // вверх
-        else if (jumpStep < 20) pos.setY(pos.y() + 6);  // вниз
+        if (jumpStep < 10) pos.setY(pos.y() - 6);
+        else if (jumpStep < 20) pos.setY(pos.y() + 6);
         characterLabel->move(pos);
 
         jumpStep++;
@@ -124,7 +129,6 @@ void MainWindow::updateAnimation()
         pos.setX(pos.x() - 8);
         characterLabel->move(pos);
 
-        // Анимация ходьбы влево
         if (escapeStep % escapeFrameInterval == 0) {
             escapeFrameIndex = (escapeFrameIndex + 1) % 3;
             QString key = QString("left_walk%1").arg(escapeFrameIndex + 1);
@@ -137,7 +141,60 @@ void MainWindow::updateAnimation()
             charState = OpeningLab;
             openLabWindow(frameRects[1], lab2Window);
         }
-    } else {
+    }
+    else if (charState == Portal) {
+        characterLabel->hide();
+
+        QLabel *gifLabel = new QLabel(this);
+        gifLabel->setScaledContents(true);
+        gifLabel->setGeometry(characterLabel->x() - 45, characterLabel->y() - 45, 150, 150);
+        gifLabel->setAttribute(Qt::WA_TranslucentBackground);
+        gifLabel->setStyleSheet("background: transparent;");
+
+        // Загружаем кадры портала один раз
+        static QList<QPixmap> portalFrames;
+        if (portalFrames.isEmpty()) {
+            for (int i = 1; i <= 11; ++i) {
+                portalFrames.append(QPixmap(QString(":/morty/portal/portal%1.png").arg(i)));
+            }
+        }
+
+        int totalFrames = portalFrames.size();
+        int frameDurationMs = 3000 / totalFrames;
+
+        // Устанавливаем первый кадр сразу
+        gifLabel->setPixmap(portalFrames[0]);
+        gifLabel->show();
+
+        // Создаём таймер для анимации
+        QTimer *portalTimer = new QTimer(this);
+        int *currentFrameIndex = new int(1);  // Начинаем с 1, так как 0 уже установлен
+
+        connect(portalTimer, &QTimer::timeout, this, [gifLabel, portalTimer, currentFrameIndex]() mutable {
+            if (*currentFrameIndex >= portalFrames.size()) {
+                portalTimer->stop();
+                gifLabel->deleteLater();
+                delete currentFrameIndex;
+
+                // Открываем окно после анимации
+                MainWindow *mainWin = qobject_cast<MainWindow*>(gifLabel->parent());
+                if (mainWin) {
+                    mainWin->openLabWindow(mainWin->frameRects[3], mainWin->lab4Window);
+                }
+                return;
+            }
+
+            gifLabel->setPixmap(portalFrames[*currentFrameIndex]);
+            ++(*currentFrameIndex);
+        });
+
+        portalTimer->start(frameDurationMs);
+
+        // Устанавливаем состояние в Idle сразу, чтобы предотвратить повторный вход
+        charState = Idle;
+    }
+
+    else {
         QString key;
         if (isWalking && charState != Jumping) {
             idleCounter = 0;
@@ -240,6 +297,22 @@ void MainWindow::openLabWindow(const QRect &frameRect, T *&labWindow)
 {
     if (!labWindow) {
         labWindow = new T(nullptr);
+
+        if constexpr (std::is_base_of<Lab4Window, T>::value) {
+            connect(labWindow, &T::hideRequested, this, [this, &labWindow]() {
+                this->hide();
+                if (labWindow) labWindow->hide();
+            });
+        }
+
+        if constexpr (std::is_base_of<Lab4Window, T>::value) {
+            connect(labWindow, &T::showRequested, this, [this, &labWindow]() {
+                labWindow->hide();
+                this->show();
+                if (labWindow) labWindow->show();
+            });
+        }
+
         connect(labWindow, &T::windowClosed, this, [this, &labWindow]() {
             characterLabel->show();
             characterLabel->setGeometry(610, 220, 60, 82);
