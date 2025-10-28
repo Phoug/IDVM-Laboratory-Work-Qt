@@ -85,6 +85,30 @@
         <file>crying/crying1.png</file>
         <file>crying/crying2.png</file>
         <file>crying/crying3.png</file>
+        <file>explosion/explose.gif</file>
+        <file>explosion/skeleton1.png</file>
+        <file>connect/calm_connect1.png</file>
+        <file>connect/calm_connect2.png</file>
+        <file>connect/calm_connect3.png</file>
+        <file>connect/connect1.png</file>
+        <file>connect/connect2.png</file>
+        <file>connect/connect3.png</file>
+        <file>connect/connect4.png</file>
+        <file>connect/connect5.png</file>
+        <file>connect/connect6.png</file>
+        <file>connect/connect7.png</file>
+        <file>connect/connect8.png</file>
+        <file>disconnect/calm_disconnect1.png</file>
+        <file>disconnect/calm_disconnect2.png</file>
+        <file>disconnect/calm_disconnect3.png</file>
+        <file>disconnect/disconnect1.png</file>
+        <file>disconnect/disconnect2.png</file>
+        <file>disconnect/disconnect3.png</file>
+        <file>disconnect/disconnect4.png</file>
+        <file>disconnect/disconnect5.png</file>
+        <file>disconnect/disconnect6.png</file>
+        <file>disconnect/disconnect7.png</file>
+        <file>disconnect/disconnect8.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>other/main_background.svg</file>

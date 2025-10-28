@@ -1,6 +1,5 @@
 #include "lab4window.h"
 #include <QFileDialog>
-#include <QDebug>
 #include <QTransform>
 #include <QProcess>
 #include <QFontDatabase>
@@ -28,7 +27,6 @@ void Lab4Window::setupUI()
     QWidget *central = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
 
-    // --- Fonts ---
     int fontId = QFontDatabase::addApplicationFont(":/fonts/fonts/KoskoBold-Bold.ttf");
     QFont koskoFont;
     if (fontId != -1) {
@@ -36,7 +34,6 @@ void Lab4Window::setupUI()
         this->setFont(koskoFont);
     }
 
-    // --- GraphicsView ---
     graphicsView = new QGraphicsView(this);
     scene = new QGraphicsScene(this);
     videoItem = new QGraphicsVideoItem();
@@ -52,7 +49,6 @@ void Lab4Window::setupUI()
 
     mainLayout->addWidget(graphicsView, 1);
 
-    // --- Character Label ---
     characterLabel = new QLabel(graphicsView);
     characterLabel->setFixedSize(79, 150);
     characterLabel->move(50, 165);
@@ -60,7 +56,6 @@ void Lab4Window::setupUI()
     characterLabel->raise();
     characterLabel->show();
 
-    // --- Background ---
     QPalette palette;
     palette.setBrush(QPalette::Window,
                      QBrush(QPixmap(":/images/other/lab4_background.svg")
@@ -68,7 +63,6 @@ void Lab4Window::setupUI()
     central->setAutoFillBackground(true);
     central->setPalette(palette);
 
-    // Update background on resize
     connect(this, &Lab4Window::resized, this, [this, central]() {
         QPalette p = central->palette();
         p.setBrush(QPalette::Window,
@@ -77,7 +71,6 @@ void Lab4Window::setupUI()
         central->setPalette(p);
     });
 
-    // --- Sprite lists ---
     spriteListCrying = { ":/morty/crying/crying1.png",
                         ":/morty/crying/crying2.png",
                         ":/morty/crying/crying3.png" };
@@ -88,7 +81,6 @@ void Lab4Window::setupUI()
     currentSprites = &spriteListCrying;
     currentFrame = 0;
 
-    // --- Animation Timer ---
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() {
         characterLabel->setPixmap(QPixmap((*currentSprites)[currentFrame]).scaled(
@@ -97,7 +89,6 @@ void Lab4Window::setupUI()
     });
     timer->start(300);
 
-    // --- Buttons ---
     auto createButton = [koskoFont](const QString &text) -> QPushButton* {
         QPushButton *btn = new QPushButton(text);
         btn->setFont(koskoFont);
@@ -159,7 +150,6 @@ void Lab4Window::setupUI()
     setWindowTitle("Лабораторная 4: Веб-камера");
     setFixedSize(900, 700);
 
-    // --- Record indicator ---
     recordIndicator = new QLabel("● REC", this);
     recordIndicator->setStyleSheet("color: red; font-weight: bold; font-size: 18px;");
     recordIndicator->move(width() - 70, 10);
@@ -369,9 +359,7 @@ void Lab4Window::startCamera()
     graphicsView->show();
     camera->start();
 
-    // Delay update to allow native size to be set
     QTimer::singleShot(100, this, &Lab4Window::updateVideoItemSize);
-    qDebug() << "Camera started.";
 }
 
 void Lab4Window::stopCamera()
@@ -391,8 +379,6 @@ void Lab4Window::stopCamera()
     mediaRecorder = nullptr;
     imageCapture = nullptr;
     camera = nullptr;
-
-    qDebug() << "Camera stopped.";
 }
 
 void Lab4Window::capturePhoto()
@@ -427,15 +413,20 @@ void Lab4Window::onImageCaptured(int id, const QImage &image)
     connect(anim, &QPropertyAnimation::finished, flash, &QWidget::deleteLater);
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 
-    if (pendingPhotoPath.isEmpty()) return;
-
-    QImage mirroredImage = image.mirrored(true, false);
-    if (mirroredImage.save(pendingPhotoPath)) {
-        qDebug() << "Photo saved to:" << pendingPhotoPath;
-    } else {
-        qDebug() << "Failed to save photo.";
+    if (pendingPhotoPath.isEmpty()) {
+        qDebug() << "No pending photo path";
+        return;
     }
 
+    QImage mirroredImage = image.flipped(Qt::Horizontal);
+
+    if (mirroredImage.save(pendingPhotoPath, "JPG", 90)) {
+        qDebug() << "Photo saved to:" << pendingPhotoPath;
+    } else {
+        qDebug() << "Failed to save photo to:" << pendingPhotoPath;
+    }
+
+    // Очищаем путь только после сохранения
     pendingPhotoPath.clear();
 }
 
@@ -471,8 +462,6 @@ void Lab4Window::startRecording()
 
     mediaRecorder->setOutputLocation(QUrl::fromLocalFile(currentTempVideo));
     mediaRecorder->record();
-
-    qDebug() << "Recording started:" << currentTempVideo;
 }
 
 void Lab4Window::stopRecording()
@@ -480,7 +469,6 @@ void Lab4Window::stopRecording()
     if (!mediaRecorder || mediaRecorder->recorderState() != QMediaRecorder::RecordingState) return;
 
     mediaRecorder->stop();
-    qDebug() << "Recording stopped:" << currentTempVideo;
 
     if (currentTempVideo.isEmpty() || currentFinalVideo.isEmpty()) return;
 
@@ -500,13 +488,10 @@ void Lab4Window::stopRecording()
     connect(ffmpegProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, [this, ffmpegProcess](int, QProcess::ExitStatus) {
                 QFile::remove(currentTempVideo);
-                qDebug() << "Temp video deleted:" << currentTempVideo;
                 ffmpegProcess->deleteLater();
             });
 
     ffmpegProcess->start("ffmpeg", args);
-
-    qDebug() << "Flipping started, output:" << currentFinalVideo;
 }
 
 void Lab4Window::closeEvent(QCloseEvent *event)

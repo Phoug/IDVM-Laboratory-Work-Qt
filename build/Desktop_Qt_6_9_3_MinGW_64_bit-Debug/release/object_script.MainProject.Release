@@ -1,10 +1,13 @@
 release/lab1window.o
 release/lab2window.o
 release/lab4window.o
+release/lab5window.o
+release/lab6window.o
 release/main.o
 release/mainwindow.o
 release/qrc_recources.o
 release/moc_lab1window.o
 release/moc_lab2window.o
 release/moc_lab4window.o
+release/moc_lab5window.o
 release/moc_mainwindow.o

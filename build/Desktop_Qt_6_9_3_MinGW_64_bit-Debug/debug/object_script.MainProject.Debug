@@ -1,10 +1,13 @@
 debug/lab1window.o
 debug/lab2window.o
 debug/lab4window.o
+debug/lab5window.o
+debug/lab6window.o
 debug/main.o
 debug/mainwindow.o
 debug/qrc_recources.o
 debug/moc_lab1window.o
 debug/moc_lab2window.o
 debug/moc_lab4window.o
+debug/moc_lab5window.o
 debug/moc_mainwindow.o

@@ -12,6 +12,7 @@
 #include "lab1window.h"
 #include "lab2window.h"
 #include "lab4window.h"
+#include "lab5window.h"
 
 class MainWindow : public QMainWindow
 {
@@ -31,7 +32,7 @@ private slots:
     void updateAnimation();
 
 private:
-    enum CharacterState { Idle, Walking, Jumping, Escaping, OpeningLab, Portal };
+    enum CharacterState { Idle, Walking, Jumping, Escaping, OpeningLab, Portal, Explosion, Exploding };
     enum Direction { None, Back, Front, Left, Right };
     Direction currentDirection = None;
     bool isWalking = false;
@@ -45,10 +46,12 @@ private:
     QLabel *frameLab[NUMBERS_OF_LAB_FRAMES];
     QRect frameRects[NUMBERS_OF_LAB_FRAMES];
     QLabel *buttonELabel;
+    QLabel* skeletonLabel;
 
     Lab1Window *lab1Window = nullptr;
     Lab2Window *lab2Window = nullptr;
     Lab4Window *lab4Window = nullptr;
+    Lab5Window *lab5Window = nullptr;
 
     CharacterState charState = Idle;
 
@@ -66,7 +69,7 @@ private:
     void loadSpritesFromFolder(const QString &folder, const QStringList &keys);
 
     template<typename T>
-    void openLabWindow(const QRect &frameRect, T *&labWindow);
+    void openLabWindow(T *&labWindow);
 };
 
 #endif // MAINWINDOW_H

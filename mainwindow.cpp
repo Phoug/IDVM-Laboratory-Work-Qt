@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     characterLabel->setStyleSheet("background: transparent;");
     characterLabel->show();
 
+    skeletonLabel = nullptr;
+
     loadSpritesFromFolder("simple", {"back_calm","back_walk1","back_walk2","back_walk3",
                                      "front_calm","front_walk1","front_walk2","front_walk3",
                                      "left_calm","left_walk1","left_walk2","left_walk3",
@@ -80,7 +82,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         for (int i=0; i < NUMBERS_OF_LAB_FRAMES; ++i) {
             if (characterLabel->geometry().intersects(frameRects[i])) {
-                if (i == 0) openLabWindow(frameRects[i], lab1Window);
+                if (i == 0) openLabWindow(lab1Window);
                 if (i == 1)
                 {
                     if (charState == Idle || charState == Walking) {
@@ -88,9 +90,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                         jumpStep = 0;
                     }
                 }
-                if (i == 3)
-                {
+                if (i == 3) {
                     charState = Portal;
+                }
+                if (i == 4) {
+                    charState = Explosion;
                 }
             }
         }
@@ -139,13 +143,13 @@ void MainWindow::updateAnimation()
         escapeStep++;
         if (escapeStep > 40) {
             charState = OpeningLab;
-            openLabWindow(frameRects[1], lab2Window);
+            openLabWindow(lab2Window);
         }
     }
     else if (charState == Portal) {
         characterLabel->hide();
 
-        QLabel *gifLabel = new QLabel(this);
+        QLabel *gifLabel = new QLabel(centralWidget());
         gifLabel->setScaledContents(true);
         gifLabel->setGeometry(characterLabel->x() - 45, characterLabel->y() - 45, 150, 150);
         gifLabel->setAttribute(Qt::WA_TranslucentBackground);
@@ -170,17 +174,14 @@ void MainWindow::updateAnimation()
         QTimer *portalTimer = new QTimer(this);
         int *currentFrameIndex = new int(1);  // Начинаем с 1, так как 0 уже установлен
 
-        connect(portalTimer, &QTimer::timeout, this, [gifLabel, portalTimer, currentFrameIndex]() mutable {
+        connect(portalTimer, &QTimer::timeout, this, [this, gifLabel, portalTimer, currentFrameIndex]() mutable {
             if (*currentFrameIndex >= portalFrames.size()) {
                 portalTimer->stop();
                 gifLabel->deleteLater();
                 delete currentFrameIndex;
 
                 // Открываем окно после анимации
-                MainWindow *mainWin = qobject_cast<MainWindow*>(gifLabel->parent());
-                if (mainWin) {
-                    mainWin->openLabWindow(mainWin->frameRects[3], mainWin->lab4Window);
-                }
+                openLabWindow(lab4Window);
                 return;
             }
 
@@ -190,10 +191,63 @@ void MainWindow::updateAnimation()
 
         portalTimer->start(frameDurationMs);
 
-        // Устанавливаем состояние в Idle сразу, чтобы предотвратить повторный вход
         charState = Idle;
     }
+    else if (charState == Explosion) {
+        characterLabel->hide();
+        isWalking = false; // Prevent movement during animation
 
+        int expWidth = 208;
+        int expHeight = 256;
+        int charX = characterLabel->x();
+        int charY = characterLabel->y();
+        int charWidth = characterLabel->width();
+        int charHeight = characterLabel->height();
+
+        skeletonLabel = new QLabel(centralWidget());
+        skeletonLabel->setPixmap(QPixmap(":/morty/explosion/skeleton1.png"));
+
+        int skelWidth = 60;
+        int skelHeight = 82;
+        skeletonLabel->setGeometry(charX + (charWidth - skelWidth) / 2,
+                                   charY + (charHeight - skelHeight) / 2,
+                                   skelWidth, skelHeight);
+        skeletonLabel->setScaledContents(true);
+        skeletonLabel->setStyleSheet("background: transparent;");
+        skeletonLabel->show();
+
+        QLabel *explosionLabel = new QLabel(centralWidget());
+        explosionLabel->setScaledContents(true);
+        explosionLabel->setGeometry(charX + (charWidth - expWidth) / 2,
+                                    (charY + (charHeight - expHeight) / 2) - 45,
+                                    expWidth, expHeight);
+        explosionLabel->setAttribute(Qt::WA_TranslucentBackground);
+        explosionLabel->setStyleSheet("background: transparent;");
+        explosionLabel->raise();    // Поверх скелета
+
+        QMovie *movie = new QMovie(":/morty/explosion/explose.gif", QByteArray(), explosionLabel);
+        explosionLabel->setMovie(movie);
+
+        movie->setCacheMode(QMovie::CacheAll);
+        movie->setSpeed(100);
+
+        connect(movie, &QMovie::frameChanged, this, [this, movie, explosionLabel]() {
+            if (movie->currentFrameNumber() == movie->frameCount() - 1) {
+                movie->stop();
+                explosionLabel->deleteLater();
+                movie->deleteLater();
+
+                skeletonLabel -> hide();
+                openLabWindow(lab5Window);
+                charState = Idle;
+            }
+        });
+
+        movie->start();
+        explosionLabel->show();
+
+        charState = Exploding;
+    }
     else {
         QString key;
         if (isWalking && charState != Jumping) {
@@ -256,7 +310,6 @@ QString MainWindow::getSleepySprite() const
     }
 }
 
-
 void MainWindow::moveCharacter()
 {
     if (!isWalking) return;
@@ -293,7 +346,7 @@ void MainWindow::loadSpritesFromFolder(const QString &folder, const QStringList 
 }
 
 template<typename T>
-void MainWindow::openLabWindow(const QRect &frameRect, T *&labWindow)
+void MainWindow::openLabWindow(T *&labWindow)
 {
     if (!labWindow) {
         labWindow = new T(nullptr);
@@ -317,9 +370,14 @@ void MainWindow::openLabWindow(const QRect &frameRect, T *&labWindow)
             characterLabel->show();
             characterLabel->setGeometry(610, 220, 60, 82);
             charState = Idle;
+            if (skeletonLabel) {
+                skeletonLabel->deleteLater();
+                skeletonLabel = nullptr;
+            }
             if (labWindow) { labWindow->deleteLater(); labWindow = nullptr; }
         });
     }
+
     characterLabel->hide();
     labWindow->show();
     labWindow->raise();

@@ -1,5 +1,6 @@
 #ifndef LAB4WINDOW_H
 #define LAB4WINDOW_H
+
 #include <QMainWindow>
 #include <QCamera>
 #include <QCameraDevice>

@@ -5,7 +5,8 @@ LIBS     += -lpowrprof
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
-win32:LIBS += -lsetupapi
+win32:LIBS += -lsetupapi -lcfgmgr32 -luser32
+LIBS += -lCfgmgr32 -lSetupapi
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -15,6 +16,8 @@ SOURCES += \
     lab1window.cpp \
     lab2window.cpp \
     lab4window.cpp \
+    lab5window.cpp \
+    lab6window.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -23,6 +26,8 @@ HEADERS += \
     lab1window.h \
     lab2window.h \
     lab4window.h \
+    lab5window.h \
+    lab6window.h \
     mainwindow.h
 
 FORMS += \
